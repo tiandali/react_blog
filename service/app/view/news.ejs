@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>dali</title>
+  <style>
+    .test {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <ul class="test">
+
+    <%
+    news.forEach(item=>{
+      %>
+    <li>
+      <a href='<%=item.url%>'>
+        <%=item.title%>
+      </a>
+      <span style="float:right">
+        <%=helper.relative(item.time)%>
+      </span>
+      <!-- <%=item.matched%> -->
+    </li>
+    <% })
+    %>
+  </ul>
+
+</body>
+
+</html>
