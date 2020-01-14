@@ -28,14 +28,14 @@ class MainController extends Controller {
       this.ctx.body = { data: '登录失败' };
     }
   }
-  //获得类型信息
+  // 获得类型信息
   async getTypeInfo() {
-    const resType = await this.app.mysql.select('type')
-    this.ctx.body = { data: resType }
+    const resType = await this.app.mysql.select('type');
+    this.ctx.body = { data: resType };
   }
-  //添加文章
+  // 添加文章
   async addArticle() {
-    let tmpArticle = this.ctx.request.body;
+    const tmpArticle = this.ctx.request.body;
     // console.log('tmpArticle: ', tmpArticle);
     const result = await this.app.mysql.insert('article', tmpArticle);
     const insertSuccess = result.affectedRows === 1;
@@ -44,20 +44,61 @@ class MainController extends Controller {
     // console.log('insertId: ', insertId);
     this.ctx.body = {
       isSuccess: insertSuccess,
-      insertId: insertId
-    }
+      insertId,
+    };
 
   }
-  //修改文章
+  // 修改文章
   async updateArticle() {
-    let tempArticle = this.ctx.request.body;
+    const tempArticle = this.ctx.request.body;
     const result = await this.app.mysql.update('article', tempArticle);
     const updateSuccess = result.affectedRows === 1;
     this.ctx.body = {
-      isSuccess: updateSuccess
-    }
+      isSuccess: updateSuccess,
+    };
 
   }
+  // 获得文章列表
+  async getArticleList() {
+    const sql = 'SELECT article.id as id,' +
+      'article.title as title,' +
+      'article.introduce as introduce,' +
+      "FROM_UNIXTIME(article.addTime,'%Y-%m-%d' ) as addTime," +
+      'type.typeName as typeName ' +
+      'FROM article LEFT JOIN type ON article.type_id = type.Id ' +
+      'ORDER BY article.id DESC ';
+
+    const resList = await this.app.mysql.query(sql);
+    // const resList = 'okkkkkkkk';
+    console.log('resList: ', resList);
+    this.ctx.body = { list: resList };
+
+  }
+  // 删除文章
+  async delArticle() {
+    const id = this.ctx.params.id;
+    const res = await this.app.mysql.delete('article', { id });
+    this.ctx.body = { data: res };
+  }
+
+  // 根据文章ID得到文章详情，用于修改文章
+  async getArticleById() {
+    const id = this.ctx.params.id;
+
+    const sql = 'SELECT article.id as id,' +
+      'article.title as title,' +
+      'article.introduce as introduce,' +
+      'article.article_content as article_content,' +
+      "FROM_UNIXTIME(article.addTime,'%Y-%m-%d' ) as addTime," +
+      'article.view_count as view_count ,' +
+      'type.typeName as typeName ,' +
+      'type.id as typeId ' +
+      'FROM article LEFT JOIN type ON article.type_id = type.Id ' +
+      'WHERE article.id=' + id;
+    const result = await this.app.mysql.query(sql);
+    this.ctx.body = { data: result };
+  }
+
 
 }
 
